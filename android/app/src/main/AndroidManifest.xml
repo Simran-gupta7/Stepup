@@ -1,0 +1,28 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.untitled1">
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+
+        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+            tools:ignore="WrongManifestParent" />
+        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+            tools:ignore="WrongManifestParent" />
+
+        <application
+            android:label="yourapp"
+            android:icon="@mipmap/ic_launcher"
+            tools:ignore="WrongManifestParent">
+            <activity
+                android:name=".MainActivity"
+                android:launchMode="singleTop"
+                android:theme="@style/LaunchTheme"
+                android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+                android:hardwareAccelerated="true"
+                android:windowSoftInputMode="adjustResize">
+                <!-- ... -->
+            </activity>
+            <!-- ... -->
+        </application>
+    </manifest>
