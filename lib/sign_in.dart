@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:untitled1/home_page.dart';
+
+import 'home_page.dart';
 
 
 
@@ -32,10 +33,12 @@ class _SignInPageState extends State<SignInPage> {
       decoration: BoxDecoration(
       image: DecorationImage(
       image: AssetImage('logo.png'), // Replace with your background image
-      fit: BoxFit.cover,
+      fit: BoxFit.contain,
+
         opacity: 10,
       ),
       ),
+
       child: Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -43,9 +46,9 @@ class _SignInPageState extends State<SignInPage> {
 
       children: <Widget>[
       // ... existing code ...
-        SizedBox(height: 50),
+        SizedBox(height: 30),
       Text('StepUpYourDance', style: TextStyle(fontSize: 50,color: Colors.pinkAccent,fontWeight: FontWeight.bold ), ),
-        SizedBox(height: 180),
+        SizedBox(height: 100),
       TextFormField(
       controller: _usernameController,
       decoration: InputDecoration(
@@ -110,21 +113,21 @@ class _SignInPageState extends State<SignInPage> {
     },
     child: Text('Sign In'),
     style: ElevatedButton.styleFrom(
-    primary: Colors.pinkAccent, // Background color
-    onPrimary: Colors.white, // Text color
+    foregroundColor: Colors.white, backgroundColor: Colors.pinkAccent, // Text color
     shape: RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(30),
     ),
     ),
     ),
     ),
-        SizedBox(height: 5),
+        SizedBox(height: 40),
             TextButton(
               onPressed: () {
                Navigator.push(context, MaterialPageRoute(builder: (context) =>  HomePage(
                  title: "StepUpYourDance",
-               ))); // Navigate to the forgot password screen
+               )));// Navigate to the forgot password screen
               },
+
 
               child: Text('Forgot Password?'),
             ),

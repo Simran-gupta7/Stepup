@@ -3,6 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:video_player/video_player.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:share/share.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+
+
 
 
 class HomePage extends StatelessWidget {
@@ -17,13 +23,29 @@ class HomePage extends StatelessWidget {
   ];
 
   final String title;
+  final TextEditingController _searchController = TextEditingController();
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: TextField(
+          controller: _searchController,
+          decoration: InputDecoration(
+            hintText: "Search choreographers",
+            prefixIcon: Icon(Icons.search),
+          ),
+          onChanged: (value) {
+            // Implement search logic here
+            // For example, you could filter the choreographers list based on the user's input
+            // This is a simplified example and does not actually filter the list
+            choreographers.where((choreographer) => choreographer.toLowerCase().contains(value.toLowerCase()));
+          },
+        ),
         actions: <Widget>[
+
           IconButton(
             icon: Icon(Icons.favorite_border), // Heart icon
             onPressed: () {
@@ -35,6 +57,7 @@ class HomePage extends StatelessWidget {
               );
             },
           ),
+
           IconButton(
             icon: Icon(Icons.account_circle),
             onPressed: () {
@@ -52,6 +75,13 @@ class HomePage extends StatelessWidget {
               );
             },
           ),
+          IconButton(
+            icon: Icon(Icons.share),
+            onPressed: () {
+              Share.share('Check out this amazing choreography!');
+            },
+          ),
+
         ],
       ),
       drawer: Drawer(
@@ -90,6 +120,7 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
+
       body: ListView.builder(
         itemCount: choreographers.length,
         itemBuilder: (context, index) {
@@ -136,7 +167,8 @@ class ProfilePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Profile'),
       ),
-      body: Center(
+      body:
+      Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -157,11 +189,34 @@ class ProfilePage extends StatelessWidget {
               Text('Videos Watched:   0'), // Replace with actual videos watched count
               Spacer(),
               ElevatedButton(
-                onPressed: () {
-                  // Handle logout logic here
-                },
-                child: Text('Log Out', style: TextStyle(fontSize:   12)),
+                onPressed: () async {
+                  // Show confirmation dialog
+                  final bool confirm = await showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Confirm Logout'),
+                        content: Text('Are you sure you want to logout?'),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            child: Text('Logout'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
 
+                  if (confirm) {
+                    // Handle logout logic here
+                    signOut(context);
+                  }
+                },
+                child: Text('Log Out', style: TextStyle(fontSize:  12)),
               ),
             ],
           ),
@@ -169,29 +224,26 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
+
+
+  Future<void> signOut(BuildContext context) async {
+    // Navigate to login screen or home screen after logout
+    //Navigator.pushReplacementNamed(context, '/login'); // Adjust the route as necessary
+    Navigator.pop(context);
+    Navigator.pop(context);
+  }
 }
 class ChoreographerPage extends StatefulWidget {
   var choreographer;
-
   var videoPath;
 
-   ChoreographerPage({Key? key, required this.choreographer, required this.videoPath}) : super(key: key);
+  ChoreographerPage({Key? key, required this.choreographer, required this.videoPath}) : super(key: key);
 
   @override
   State<ChoreographerPage> createState() => _ChoreographerPageState();
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
-  }
-
-
 }
 
 class _ChoreographerPageState extends State<ChoreographerPage> {
-
-  get index => null;
   late final String choreographer;
   late final String videoPath; // Path to the video file
   late VideoPlayerController _controller;
@@ -199,11 +251,15 @@ class _ChoreographerPageState extends State<ChoreographerPage> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.asset((widget.videoPath))
+    _controller = VideoPlayerController.asset('assets/dmk.mp4')
       ..initialize().then((_) {
         // Ensure the first frame is shown after the video is initialized.
         setState(() {});
+      }).catchError((error) {
+        // Handle the error
+        print("Error initializing video player: $error");
       });
+
   }
 
   @override
@@ -219,12 +275,34 @@ class _ChoreographerPageState extends State<ChoreographerPage> {
         title: Text(widget.choreographer),
       ),
       body: Center(
-        child: _controller.value.isInitialized
-            ? AspectRatio(
-          aspectRatio: _controller.value.aspectRatio,
-          child: VideoPlayer(_controller),
-        )
-            : const CircularProgressIndicator(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            _controller.value.isInitialized
+                ? AspectRatio(
+              aspectRatio: _controller.value.aspectRatio,
+              child: VideoPlayer(_controller),
+            )
+                : const CircularProgressIndicator(),
+            SizedBox(height:  20), // Space between video player and rating bar
+            RatingBar.builder(
+              initialRating:  3,
+              minRating:  1,
+              direction: Axis.horizontal,
+              allowHalfRating: true,
+              itemCount:  5,
+              itemPadding: EdgeInsets.symmetric(horizontal:  4.0),
+              itemBuilder: (context, _) => Icon(
+                Icons.star,
+                color: Colors.amber,
+              ),
+              onRatingUpdate: (rating) {
+                // Handle rating update
+                print("Rating: $rating");
+              },
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -239,7 +317,6 @@ class _ChoreographerPageState extends State<ChoreographerPage> {
         ),
       ),
     );
-
   }
 }
 class LikedSongsPage extends StatelessWidget {
@@ -255,3 +332,4 @@ class LikedSongsPage extends StatelessWidget {
     );
   }
 }
+
