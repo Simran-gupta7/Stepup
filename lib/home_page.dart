@@ -6,6 +6,7 @@ import 'package:video_player/video_player.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 
 
@@ -89,9 +90,9 @@ class HomePage extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              child: Text('Menu'),
+              child: Text('Menu', style : TextStyle(fontSize: 20,fontWeight: FontWeight.bold) ),
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: Colors.pink,
               ),
             ),
 
@@ -251,7 +252,10 @@ class _ChoreographerPageState extends State<ChoreographerPage> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.asset('assets/dmk.mp4')
+    _controller = VideoPlayerController.asset('assets/dmk.mp4');
+    _controller = VideoPlayerController.asset('assets/Hmd.mp4');
+    _controller = VideoPlayerController.asset('assets/Shk.mp4')
+
       ..initialize().then((_) {
         // Ensure the first frame is shown after the video is initialized.
         setState(() {});
@@ -259,6 +263,14 @@ class _ChoreographerPageState extends State<ChoreographerPage> {
         // Handle the error
         print("Error initializing video player: $error");
       });
+    child: FittedBox(
+      fit: BoxFit.cover, // Use BoxFit.cover to ensure the video covers the available space without distorting its aspect ratio
+      child: SizedBox(
+        width: double.infinity, // Ensure the FittedBox takes the full width of its parent
+        height: double.infinity, // Ensure the FittedBox takes the full height of its parent
+        child: VideoPlayer(_controller),
+      ),
+    );
 
   }
 
@@ -284,7 +296,7 @@ class _ChoreographerPageState extends State<ChoreographerPage> {
               child: VideoPlayer(_controller),
             )
                 : const CircularProgressIndicator(),
-            SizedBox(height:  20), // Space between video player and rating bar
+            SizedBox(height:  10), // Space between video player and rating bar
             RatingBar.builder(
               initialRating:  3,
               minRating:  1,
@@ -332,4 +344,58 @@ class LikedSongsPage extends StatelessWidget {
     );
   }
 }
+class MyHomePage2 extends StatefulWidget {
+  @override
+  _MyHomePage2State createState() => _MyHomePage2State();
+}
 
+class _MyHomePage2State extends State<MyHomePage2> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Flutter Slidable Example'),
+      ),
+      body: ListView.builder(
+        itemCount: 20,
+        itemBuilder: (context, index) {
+          return Slidable(
+            actionPane: SlidableDrawerActionPane(),
+            actionExtentRatio: 0.25,
+            child: ListTile(
+              title: Text('Item $index'),
+            ),
+            actions: <Widget>[
+              IconSlideAction(
+                caption: 'Archive',
+                color: Colors.blue,
+                icon: Icons.archive,
+                onTap: () => print('Archive'),
+              ),
+              IconSlideAction(
+                caption: 'Share',
+                color: Colors.indigo,
+                icon: Icons.share,
+                onTap: () => print('Share'),
+              ),
+            ],
+            secondaryActions: <Widget>[
+              IconSlideAction(
+                caption: 'More',
+                color: Colors.black45,
+                icon: Icons.more_horiz,
+                onTap: () => print('More'),
+              ),
+              IconSlideAction(
+                caption: 'Delete',
+                color: Colors.red,
+                icon: Icons.delete,
+                onTap: () => print('Delete'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
